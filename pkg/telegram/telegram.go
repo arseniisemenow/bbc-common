@@ -31,8 +31,7 @@ func NewBotClientFromEnv() (*BotClient, error) {
 
 // SendPlainMessage sends a simple text message
 func (bc *BotClient) SendPlainMessage(chatID int64, text string) error {
-	// Escape special characters for Telegram MarkdownV2
-	escapedText := escapeMarkdownV2(text)
+	escapedText := tba.EscapeText(tba.ModeMarkdownV2, text)
 
 	msg := tba.NewMessage(chatID, escapedText)
 	msg.ParseMode = "MarkdownV2"
@@ -43,7 +42,7 @@ func (bc *BotClient) SendPlainMessage(chatID int64, text string) error {
 
 // SendMessageWithKeyboard sends a message with an inline keyboard
 func (bc *BotClient) SendMessageWithKeyboard(chatID int64, text string, keyboard interface{}) (int, error) {
-	escapedText := escapeMarkdownV2(text)
+	escapedText := tba.EscapeText(tba.ModeMarkdownV2, text)
 
 	msg := tba.NewMessage(chatID, escapedText)
 	msg.ParseMode = "MarkdownV2"
@@ -58,7 +57,7 @@ func (bc *BotClient) SendMessageWithKeyboard(chatID int64, text string, keyboard
 
 // EditMessage edits an existing message
 func (bc *BotClient) EditMessage(chatID int64, messageID int, text string) error {
-	escapedText := escapeMarkdownV2(text)
+	escapedText := tba.EscapeText(tba.ModeMarkdownV2, text)
 
 	msg := tba.NewEditMessageText(chatID, messageID, escapedText)
 	msg.ParseMode = "MarkdownV2"
@@ -76,7 +75,7 @@ func (bc *BotClient) AnswerCallbackQuery(callbackQueryID, text string) error {
 
 // SendInlineKeyboard sends a message with inline buttons
 func (bc *BotClient) SendInlineKeyboard(chatID int64, text string, buttons [][]tba.InlineKeyboardButton) (int, error) {
-	escapedText := escapeMarkdownV2(text)
+	escapedText := tba.EscapeText(tba.ModeMarkdownV2, text)
 
 	msg := tba.NewMessage(chatID, escapedText)
 	msg.ParseMode = "MarkdownV2"
@@ -87,21 +86,6 @@ func (bc *BotClient) SendInlineKeyboard(chatID int64, text string, buttons [][]t
 		return 0, err
 	}
 	return sent.MessageID, nil
-}
-
-// escapeMarkdownV2 escapes special characters for Telegram MarkdownV2
-func escapeMarkdownV2(text string) string {
-	// Characters that need to be escaped in MarkdownV2
-	specialChars := "_*[]()~`>#+-=|{}.!"
-
-	var result strings.Builder
-	for _, char := range text {
-		if strings.ContainsRune(specialChars, char) {
-			result.WriteRune('\\')
-		}
-		result.WriteRune(char)
-	}
-	return result.String()
 }
 
 // FormatTripMessage formats a trip notification message
