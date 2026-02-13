@@ -167,6 +167,8 @@ func GetActiveUsers(ctx context.Context) ([]models.User, error) {
 
 // GetUserTokens retrieves tokens for a user
 func GetUserTokens(ctx context.Context, chatID int64) (*models.UserTokens, error) {
+	log.Printf("[YDB] GetUserTokens: searching for chatID=%d", chatID)
+
 	sql := TablePathPrefix("") + `
 		DECLARE $telegram_chat_id AS Int64;
 
@@ -186,6 +188,7 @@ func GetUserTokens(ctx context.Context, chatID int64) (*models.UserTokens, error
 	defer res.Close()
 
 	if res.NextRow() {
+		log.Printf("[YDB] GetUserTokens: found row for chatID=%d", chatID)
 		var tokens models.UserTokens
 		var datadome, appToken *string
 		var createdAt, updatedAt uint32
@@ -205,11 +208,14 @@ func GetUserTokens(ctx context.Context, chatID int64) (*models.UserTokens, error
 		return &tokens, nil
 	}
 
+	log.Printf("[YDB] GetUserTokens: no row found for chatID=%d, returning ErrTokensNotFound", chatID)
 	return nil, ErrTokensNotFound
 }
 
 // StoreUserTokens stores or updates user tokens
 func StoreUserTokens(ctx context.Context, tokens *models.UserTokens) error {
+	log.Printf("[YDB] StoreUserTokens: storing tokens for chatID=%d, userID=%s", tokens.TelegramChatID, tokens.UserID)
+
 	sql := TablePathPrefix("") + `
 		DECLARE $telegram_chat_id AS Int64;
 		DECLARE $access_token AS Utf8;
