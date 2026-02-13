@@ -9,6 +9,8 @@ require (
 )
 
 require (
+	github.com/flymedllva/ydb-go-qb v0.0.0-20240108142018-7a30d57e17f1 // indirect
+	github.com/georgysavva/scany/v2 v2.0.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect

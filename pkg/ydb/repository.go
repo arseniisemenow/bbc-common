@@ -10,6 +10,7 @@ import (
 	"github.com/ydb-platform/ydb-go-sdk/v3/table/types"
 
 	"github.com/arseniisemenow/bbc-common/pkg/models"
+	"github.com/flymedllva/ydb-go-qb/yscan"
 )
 
 // optionalDatetime creates an optional Datetime value from a uint32 pointer
@@ -190,17 +191,9 @@ func GetUserTokens(ctx context.Context, chatID int64) (*models.UserTokens, error
 	if res.NextRow() {
 		log.Printf("[YDB] GetUserTokens: found row for chatID=%d", chatID)
 		var tokens models.UserTokens
-		var datadome, appToken *string
-		err = res.Scan(&tokens.TelegramChatID, &tokens.AccessToken, &tokens.RefreshToken,
-			&tokens.UserID, &datadome, &appToken, &tokens.CreatedAt, &tokens.UpdatedAt)
+		err = yscan.ScanRow(&tokens, res)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan user tokens: %w", err)
-		}
-		if datadome != nil {
-			tokens.Datadome = *datadome
-		}
-		if appToken != nil {
-			tokens.AppToken = *appToken
 		}
 		return &tokens, nil
 	}
