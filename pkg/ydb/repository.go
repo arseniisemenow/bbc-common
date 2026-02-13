@@ -191,9 +191,8 @@ func GetUserTokens(ctx context.Context, chatID int64) (*models.UserTokens, error
 		log.Printf("[YDB] GetUserTokens: found row for chatID=%d", chatID)
 		var tokens models.UserTokens
 		var datadome, appToken *string
-		var createdAt, updatedAt *uint32
 		err = res.Scan(&tokens.TelegramChatID, &tokens.AccessToken, &tokens.RefreshToken,
-			&tokens.UserID, &datadome, &appToken, &createdAt, &updatedAt)
+			&tokens.UserID, &datadome, &appToken, &tokens.CreatedAt, &tokens.UpdatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan user tokens: %w", err)
 		}
@@ -202,12 +201,6 @@ func GetUserTokens(ctx context.Context, chatID int64) (*models.UserTokens, error
 		}
 		if appToken != nil {
 			tokens.AppToken = *appToken
-		}
-		if createdAt != nil {
-			tokens.CreatedAt = time.Unix(int64(*createdAt), 0)
-		}
-		if updatedAt != nil {
-			tokens.UpdatedAt = time.Unix(int64(*updatedAt), 0)
 		}
 		return &tokens, nil
 	}
