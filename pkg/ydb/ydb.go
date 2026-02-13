@@ -12,7 +12,7 @@ import (
 	"github.com/ydb-platform/ydb-go-sdk/v3/table/result"
 	"github.com/ydb-platform/ydb-go-sdk/v3/table/types"
 
-	yc "github.com/ydb-platform/ydb-go-sdk/v3/credentials"
+	yc "github.com/ydb-platform/ydb-go-yc-metadata"
 )
 
 var (
@@ -42,7 +42,8 @@ func GetConnection(ctx context.Context) (*ydb.Driver, error) {
 		log.Printf("[YDB] Connection string: %s", connectionString)
 
 		db, initErr = ydb.Open(ctx, connectionString,
-			yc.WithCredentials(yc.NewInstanceMetadataCredentials(yc.WithInternalCA())),
+			yc.WithCredentials(), // Use instance metadata service for authentication
+			yc.WithInternalCA(),  // Append Yandex Cloud certificates
 		)
 
 		if initErr != nil {
